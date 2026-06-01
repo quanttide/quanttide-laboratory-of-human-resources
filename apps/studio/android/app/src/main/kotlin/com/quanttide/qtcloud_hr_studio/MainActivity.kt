@@ -1,4 +1,4 @@
-package com.quanttide.studio
+package com.quanttide.qtcloud_hr_studio
 
 import io.flutter.embedding.android.FlutterActivity
 

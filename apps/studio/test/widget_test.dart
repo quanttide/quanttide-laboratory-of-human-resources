@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:studio/main.dart';
+import 'package:qtcloud_hr_studio/main.dart';
 
 void main() {
   testWidgets('Recruitment app renders', (WidgetTester tester) async {

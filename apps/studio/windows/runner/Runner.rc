@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.quanttide" "\0"
-            VALUE "FileDescription", "studio" "\0"
+            VALUE "FileDescription", "qtcloud-hr-studio" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "studio" "\0"
+            VALUE "InternalName", "qtcloud-hr-studio" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.quanttide. All rights reserved." "\0"
-            VALUE "OriginalFilename", "studio.exe" "\0"
-            VALUE "ProductName", "studio" "\0"
+            VALUE "OriginalFilename", "qtcloud-hr-studio.exe" "\0"
+            VALUE "ProductName", "qtcloud-hr-studio" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
