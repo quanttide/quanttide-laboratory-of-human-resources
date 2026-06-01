@@ -1,6 +1,6 @@
-# studio
+# qtcloud-hr-studio
 
-A new Flutter project.
+量潮人事云工作台 - QtCloud HR Studio
 
 ## Getting Started
 
