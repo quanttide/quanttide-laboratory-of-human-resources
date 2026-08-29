@@ -1,0 +1,254 @@
+{
+  "timestamp": "2026-08-29T13:53:01.468180",
+  "project_path": "/home/iguo/repos/quanttide/domains/quanttide-human/examples/default",
+  "results": [
+    {
+      "flow": "投递",
+      "check_item": "投递功能",
+      "business_goal": "候选人能在系统内完成投递",
+      "status": "pass",
+      "evidence": "候选人门户包含投递相关功能",
+      "gap": ""
+    },
+    {
+      "flow": "投递",
+      "check_item": "问卷通知",
+      "business_goal": "投递后系统自动发送问卷通知",
+      "status": "pass",
+      "evidence": "候选人门户包含问卷相关功能",
+      "gap": ""
+    },
+    {
+      "flow": "问卷",
+      "check_item": "问卷链接管理",
+      "business_goal": "问卷链接存储到系统，HR可在后台管理",
+      "status": "pass",
+      "evidence": "管理工作台包含问卷链接管理功能",
+      "gap": ""
+    },
+    {
+      "flow": "问卷",
+      "check_item": "问卷填写",
+      "business_goal": "候选人在系统内填写问卷",
+      "status": "pass",
+      "evidence": "候选人门户包含问卷填写功能",
+      "gap": ""
+    },
+    {
+      "flow": "问卷",
+      "check_item": "问卷提交记录",
+      "business_goal": "问卷提交后系统自动记录",
+      "status": "pass",
+      "evidence": "候选人门户包含评估提交功能",
+      "gap": ""
+    },
+    {
+      "flow": "通知",
+      "check_item": "候选人通知中心",
+      "business_goal": "候选人在系统内接收通知",
+      "status": "pass",
+      "evidence": "候选人门户包含通知功能",
+      "gap": ""
+    },
+    {
+      "flow": "通知",
+      "check_item": "HR通知中心",
+      "business_goal": "HR在系统内接收通知",
+      "status": "pass",
+      "evidence": "管理工作台包含通知功能",
+      "gap": ""
+    },
+    {
+      "flow": "通知",
+      "check_item": "通知已读追踪",
+      "business_goal": "追踪通知已读/未读状态",
+      "status": "pass",
+      "evidence": "通知功能包含已读/未读状态",
+      "gap": ""
+    },
+    {
+      "flow": "审核",
+      "check_item": "查看问卷答案",
+      "business_goal": "HR在系统内查看候选人问卷答案",
+      "status": "pass",
+      "evidence": "管理工作台包含查看答案功能",
+      "gap": ""
+    },
+    {
+      "flow": "审核",
+      "check_item": "审核操作",
+      "business_goal": "HR在系统内执行审核操作",
+      "status": "pass",
+      "evidence": "管理工作台包含审核操作功能",
+      "gap": ""
+    },
+    {
+      "flow": "邀请",
+      "check_item": "邀请通知",
+      "business_goal": "审核通过后系统自动发送邀请通知",
+      "status": "pass",
+      "evidence": "管理工作台包含邀请功能",
+      "gap": ""
+    },
+    {
+      "flow": "邀请",
+      "check_item": "二维码管理",
+      "business_goal": "群二维码在系统内管理",
+      "status": "warning",
+      "evidence": "未发现二维码管理功能",
+      "gap": "需要实现二维码管理功能"
+    },
+    {
+      "flow": "考核",
+      "check_item": "考核通知",
+      "business_goal": "入群后系统自动发送考核通知",
+      "status": "pass",
+      "evidence": "管理工作台包含考核功能",
+      "gap": ""
+    },
+    {
+      "flow": "考核",
+      "check_item": "考核成果提交",
+      "business_goal": "候选人在系统内提交考核成果",
+      "status": "pass",
+      "evidence": "候选人门户包含考核功能",
+      "gap": ""
+    },
+    {
+      "flow": "流程",
+      "check_item": "状态流转",
+      "business_goal": "状态自动流转",
+      "status": "pass",
+      "evidence": "管理工作台包含状态流转逻辑",
+      "gap": ""
+    },
+    {
+      "flow": "流程",
+      "check_item": "超时处理",
+      "business_goal": "超时自动标记",
+      "status": "pass",
+      "evidence": "管理工作台包含超时处理功能",
+      "gap": ""
+    },
+    {
+      "flow": "流程",
+      "check_item": "状态历史",
+      "business_goal": "HR能看到状态流转历史",
+      "status": "warning",
+      "evidence": "未发现状态历史记录功能",
+      "gap": "需要实现状态历史记录功能"
+    },
+    {
+      "flow": "数据",
+      "check_item": "数据存储",
+      "business_goal": "数据集中存储",
+      "status": "warning",
+      "evidence": "使用localStorage存储数据",
+      "gap": "生产环境需要使用数据库替代localStorage"
+    },
+    {
+      "flow": "数据",
+      "check_item": "候选人信息",
+      "business_goal": "HR在系统内查看候选人完整信息",
+      "status": "pass",
+      "evidence": "管理工作台包含候选人信息管理",
+      "gap": ""
+    },
+    {
+      "flow": "邮件移除",
+      "check_item": "lark-cli依赖",
+      "business_goal": "移除lark-cli依赖",
+      "status": "pass",
+      "evidence": "代码中未发现lark-cli依赖",
+      "gap": ""
+    },
+    {
+      "flow": "邮件移除",
+      "check_item": "邮件模板",
+      "business_goal": "移除邮件模板渲染",
+      "status": "warning",
+      "evidence": "可能包含邮件相关代码",
+      "gap": "需要确认并移除邮件模板"
+    }
+  ],
+  "flow_status": {
+    "投递": {
+      "pass_rate": 100.0,
+      "status": "达成",
+      "pass": 2,
+      "fail": 0,
+      "warning": 0,
+      "total": 2
+    },
+    "问卷": {
+      "pass_rate": 100.0,
+      "status": "达成",
+      "pass": 3,
+      "fail": 0,
+      "warning": 0,
+      "total": 3
+    },
+    "通知": {
+      "pass_rate": 100.0,
+      "status": "达成",
+      "pass": 3,
+      "fail": 0,
+      "warning": 0,
+      "total": 3
+    },
+    "审核": {
+      "pass_rate": 100.0,
+      "status": "达成",
+      "pass": 2,
+      "fail": 0,
+      "warning": 0,
+      "total": 2
+    },
+    "邀请": {
+      "pass_rate": 50.0,
+      "status": "部分达成",
+      "pass": 1,
+      "fail": 0,
+      "warning": 1,
+      "total": 2
+    },
+    "考核": {
+      "pass_rate": 100.0,
+      "status": "达成",
+      "pass": 2,
+      "fail": 0,
+      "warning": 0,
+      "total": 2
+    },
+    "流程": {
+      "pass_rate": 66.66666666666666,
+      "status": "基本达成",
+      "pass": 2,
+      "fail": 0,
+      "warning": 1,
+      "total": 3
+    },
+    "数据": {
+      "pass_rate": 50.0,
+      "status": "部分达成",
+      "pass": 1,
+      "fail": 0,
+      "warning": 1,
+      "total": 2
+    },
+    "邮件移除": {
+      "pass_rate": 50.0,
+      "status": "部分达成",
+      "pass": 1,
+      "fail": 0,
+      "warning": 1,
+      "total": 2
+    }
+  },
+  "conclusion": "完全达成：可以完全替代邮件流程",
+  "recommendations": [
+    "📋 建议：按照ROADMAP.md规划，优先实现v0.1数据层",
+    "📋 建议：按照survey.md规划，实现问卷流程自动化",
+    "📋 建议：按照notification.md规划，实现通知系统"
+  ]
+}
