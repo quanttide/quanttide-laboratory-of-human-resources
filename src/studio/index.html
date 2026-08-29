@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>量潮招聘考核工作流</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; }
+    
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: #1a1a2e; color: #fff; padding: 20px 0; }
+    .main { flex: 1; padding: 20px; }
+    
+    /* Sidebar */
+    .logo { padding: 0 20px 20px; font-size: 18px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .nav { margin-top: 20px; }
+    .nav-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+    .nav-item:hover { background: rgba(255,255,255,0.1); }
+    .nav-item.active { background: rgba(255,255,255,0.15); border-left: 3px solid #4f46e5; }
+    .nav-icon { width: 20px; text-align: center; }
+    
+    /* Header */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header h1 { font-size: 24px; color: #1a1a2e; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 4px 8px; font-size: 12px; }
+    
+    /* Cards */
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+    
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
+    .stat-card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 32px; font-weight: 700; color: #4f46e5; }
+    .stat-label { font-size: 14px; color: #6b7280; margin-top: 5px; }
+    
+    /* Table */
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .table th { background: #f9fafb; font-weight: 600; color: #374151; }
+    .table tr:hover { background: #f9fafb; }
+    
+    /* Status */
+    .status { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-survey_sent { background: #dbeafe; color: #1e40af; }
+    .status-survey_done { background: #d1fae5; color: #065f46; }
+    .status-invited { background: #e0e7ff; color: #3730a3; }
+    .status-exam_sent { background: #fce7f3; color: #9d174d; }
+    .status-exam_done { background: #d1fae5; color: #065f46; }
+    .status-offered { background: #bbf7d0; color: #166534; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    .status-withdrawn { background: #e5e7eb; color: #374151; }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
+    .tab { padding: 10px 16px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab.active { border-bottom-color: #4f46e5; color: #4f46e5; font-weight: 600; }
+    .tab:hover { color: #4f46e5; }
+    
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 8px; padding: 24px; width: 500px; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 18px; font-weight: 600; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #6b7280; }
+    
+    /* Form */
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    
+    /* Question */
+    .question { background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .question-label { font-weight: 500; color: #1a1a2e; }
+    .question-type { font-size: 12px; color: #6b7280; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; }
+    .question-options { margin-top: 10px; }
+    .option { padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+    .option input[type="radio"], .option input[type="checkbox"] { width: 16px; height: 16px; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 20px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e5e7eb; }
+    .timeline-item { position: relative; padding-bottom: 20px; }
+    .timeline-dot { position: absolute; left: -16px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #4f46e5; }
+    .timeline-dot.completed { background: #10b981; }
+    .timeline-dot.current { background: #f59e0b; box-shadow: 0 0 0 4px rgba(245,158,11,0.2); }
+    .timeline-content { background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .timeline-time { font-size: 12px; color: #6b7280; }
+    
+    /* Notification */
+    .notification { position: fixed; top: 20px; right: 20px; background: #10b981; color: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s; z-index: 200; }
+    .notification.show { transform: translateX(0); }
+    .notification.error { background: #ef4444; }
+    
+    /* Hidden */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">量潮招聘系统</div>
+      <div class="nav">
+        <div class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">📊</span> 工作台
+        </div>
+        <div class="nav-item" data-page="candidates">
+          <span class="nav-icon">👥</span> 候选人
+        </div>
+        <div class="nav-item" data-page="assessments">
+          <span class="nav-icon">📝</span> 评估管理
+        </div>
+        <div class="nav-item" data-page="workflow">
+          <span class="nav-icon">🔄</span> 流程管理
+        </div>
+        <div class="nav-item" data-page="notifications">
+          <span class="nav-icon">🔔</span> 通知中心
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Dashboard Page -->
+      <div id="page-dashboard" class="page">
+        <div class="header">
+          <h1>工作台</h1>
+          <button class="btn btn-primary" onclick="showAddCandidateModal()">+ 新增候选人</button>
+        </div>
+        
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">候选人总数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-pending">0</div>
+            <div class="stat-label">待处理</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-in-progress">0</div>
+            <div class="stat-label">进行中</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-completed">0</div>
+            <div class="stat-label">已完成</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">最近动态</div>
+          </div>
+          <div id="recent-activities"></div>
+        </div>
+      </div>
+
+      <!-- Candidates Page -->
+      <div id="page-candidates" class="page hidden">
+        <div class="header">
+          <h1>候选人管理</h1>
+          <button class="btn btn-primary" onclick="showAddCandidateModal()">+ 新增候选人</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">候选人列表</div>
+            <select class="form-select" style="width: auto;" onchange="filterCandidates(this.value)">
+              <option value="all">全部状态</option>
+              <option value="pending">待处理</option>
+              <option value="survey_sent">已发问卷</option>
+              <option value="survey_done">已填问卷</option>
+              <option value="invited">已邀请</option>
+              <option value="exam_sent">已发考核</option>
+              <option value="exam_done">已完成考核</option>
+              <option value="offered">已发Offer</option>
+              <option value="rejected">已拒绝</option>
+            </select>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>邮箱</th>
+                <th>岗位</th>
+                <th>状态</th>
+                <th>投递时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="candidates-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Assessments Page -->
+      <div id="page-assessments" class="page hidden">
+        <div class="header">
+          <h1>评估管理</h1>
+          <button class="btn btn-primary" onclick="showCreateAssessmentModal()">+ 创建评估</button>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active" data-type="questionnaire" onclick="switchAssessmentTab(this)">问卷</div>
+          <div class="tab" data-type="exam" onclick="switchAssessmentTab(this)">考核</div>
+          <div class="tab" data-type="interview" onclick="switchAssessmentTab(this)">面试</div>
+        </div>
+
+        <div id="assessments-list"></div>
+      </div>
+
+      <!-- Workflow Page -->
+      <div id="page-workflow" class="page hidden">
+        <div class="header">
+          <h1>流程管理</h1>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">候选人进度追踪</div>
+            <select class="form-select" style="width: auto;" onchange="selectCandidateForWorkflow(this.value)">
+              <option value="">选择候选人</option>
+            </select>
+          </div>
+          <div id="workflow-timeline"></div>
+        </div>
+
+        <div class="card" id="workflow-actions-card" style="display: none;">
+          <div class="card-header">
+            <div class="card-title">可执行操作</div>
+          </div>
+          <div id="workflow-actions"></div>
+        </div>
+      </div>
+
+      <!-- Notifications Page -->
+      <div id="page-notifications" class="page hidden">
+        <div class="header">
+          <h1>通知中心</h1>
+          <button class="btn btn-secondary" onclick="markAllNotificationsRead()">全部标记已读</button>
+        </div>
+
+        <div class="card">
+          <div id="notifications-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Candidate Modal -->
+  <div class="modal-overlay" id="modal-add-candidate">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">新增候选人</div>
+        <button class="modal-close" onclick="closeModal('modal-add-candidate')">&times;</button>
+      </div>
+      <form onsubmit="addCandidate(event)">
+        <div class="form-group">
+          <label class="form-label">姓名</label>
+          <input type="text" class="form-input" id="candidate-name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">邮箱</label>
+          <input type="email" class="form-input" id="candidate-email" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">岗位</label>
+          <select class="form-select" id="candidate-job" required>
+            <option value="data_engineer">数据工程师</option>
+            <option value="product_manager">产品经理</option>
+            <option value="hr">HR</option>
+            <option value="business_manager">商务经理</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">来源</label>
+          <input type="text" class="form-input" id="candidate-source" placeholder="如：GitHub、邮箱投递">
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add-candidate')">取消</button>
+          <button type="submit" class="btn btn-primary">确认添加</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Assessment Modal -->
+  <div class="modal-overlay" id="modal-assessment">
+    <div class="modal" style="width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title" id="assessment-modal-title">创建评估</div>
+        <button class="modal-close" onclick="closeModal('modal-assessment')">&times;</button>
+      </div>
+      <div id="assessment-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Take Assessment Modal -->
+  <div class="modal-overlay" id="modal-take-assessment">
+    <div class="modal" style="width: 700px;">
+      <div class="modal-header">
+        <div class="modal-title" id="take-assessment-title">填写评估</div>
+        <button class="modal-close" onclick="closeModal('modal-take-assessment')">&times;</button>
+      </div>
+      <div id="take-assessment-content"></div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <script>
+    // ============ Data Store ============
+    const store = {
+      candidates: [],
+      assessments: [],
+      answers: [],
+      notifications: [],
+      activities: []
+    };
+
+    // Load from localStorage
+    function loadData() {
+      const saved = localStorage.getItem('recruitment-store');
+      if (saved) {
+        Object.assign(store, JSON.parse(saved));
+      } else {
+        initSampleData();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem('recruitment-store', JSON.stringify(store));
+    }
+
+    // Initialize sample data
+    function initSampleData() {
+      store.candidates = [
+        { id: 'c001', name: '张三', email: 'zhangsan@example.com', job: 'data_engineer', status: 'survey_done', source: 'GitHub', created_at: '2024-01-10T10:00:00Z' },
+        { id: 'c002', name: '李四', email: 'lisi@example.com', job: 'product_manager', status: 'pending', source: '邮箱投递', created_at: '2024-01-12T14:00:00Z' },
+        { id: 'c003', name: '王五', email: 'wangwu@example.com', job: 'data_engineer', status: 'exam_sent', source: '内推', created_at: '2024-01-08T09:00:00Z' }
+      ];
+
+      store.assessments = [
+        {
+          id: 'a001', type: 'questionnaire', title: '量潮科技准入问卷',
+          questions: [
+            { id: 'q001', type: 'text', category: 'basic', order: 1, required: true, label: '您的姓名和专业' },
+            { id: 'q002', type: 'select', category: 'basic', order: 2, required: true, label: '请选择您的岗位方向', options: [
+              { value: 'product_manager', label: '产品经理' },
+              { value: 'data_engineer', label: '数据工程师' },
+              { value: 'hr', label: 'HR' },
+              { value: 'business_manager', label: '商务经理' }
+            ]},
+            { id: 'q003', type: 'multi_select', category: 'motivation', order: 3, required: true, label: '驱动你这次看机会的最主要原因是什么？', options: [
+              { value: 'growth_limit', label: '看不到成长' },
+              { value: 'industry_change', label: '想换赛道' },
+              { value: 'attracted_by_brand', label: '被量潮吸引' }
+            ]},
+            { id: 'q004', type: 'text', category: 'values', order: 4, required: true, label: '如果你入职后发现实际工作和预期有出入，你会怎么应对？' }
+          ]
+        },
+        {
+          id: 'a002', type: 'exam', title: '数据工程师笔试', time_limit: 60,
+          questions: [
+            { id: 'q101', type: 'select', category: 'technical', order: 1, required: true, label: '以下哪个是列式数据库？', options: [
+              { value: 'a', label: 'MySQL' },
+              { value: 'b', label: 'PostgreSQL' },
+              { value: 'c', label: 'ClickHouse' },
+              { value: 'd', label: 'MongoDB' }
+            ]},
+            { id: 'q102', type: 'text', category: 'technical', order: 2, required: true, label: '请简述 ETL 和 ELT 的区别' },
+            { id: 'q103', type: 'code', category: 'technical', order: 3, required: true, label: '用 Python 实现列表去重并排序' }
+          ]
+        },
+        {
+          id: 'a003', type: 'interview', title: '技术面试',
+          questions: [
+            { id: 'q201', type: 'text', category: 'behavioral', order: 1, required: true, label: '请介绍一个你主导的项目，遇到的最大挑战是什么？' },
+            { id: 'q202', type: 'text', category: 'situational', order: 2, required: true, label: '如果团队成员对你的方案有不同意见，你会怎么处理？' },
+            { id: 'q203', type: 'scale', category: 'evaluation', order: 3, required: true, label: '沟通能力评分', scale_config: { min: 1, max: 5 } }
+          ]
+        }
+      ];
+
+      store.notifications = [
+        { id: 'n001', type: 'system', title: '系统初始化', content: '欢迎使用量潮招聘系统', read: false, created_at: new Date().toISOString() }
+      ];
+
+      store.activities = [
+        { id: 'act001', type: 'candidate_added', content: '张三 投递了 数据工程师 岗位', time: '2024-01-10T10:00:00Z' },
+        { id: 'act002', type: 'candidate_added', content: '李四 投递了 产品经理 岗位', time: '2024-01-12T14:00:00Z' }
+      ];
+
+      saveData();
+    }
+
+    // ============ Page Navigation ============
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      document.getElementById(`page-${pageName}`).classList.remove('hidden');
+      document.querySelector(`.nav-item[data-page="${pageName}"]`).classList.add('active');
+      
+      switch(pageName) {
+        case 'dashboard': renderDashboard(); break;
+        case 'candidates': renderCandidates(); break;
+        case 'assessments': renderAssessments(); break;
+        case 'workflow': renderWorkflow(); break;
+        case 'notifications': renderNotifications(); break;
+      }
+    }
+
+    // Navigation click handlers
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => showPage(item.dataset.page));
+    });
+
+    // ============ Status Helpers ============
+    const statusLabels = {
+      pending: '待处理',
+      survey_sent: '已发问卷',
+      survey_done: '已填问卷',
+      invited: '已邀请',
+      exam_sent: '已发考核',
+      exam_done: '已完成考核',
+      offered: '已发Offer',
+      rejected: '已拒绝',
+      withdrawn: '已退出'
+    };
+
+    const jobLabels = {
+      data_engineer: '数据工程师',
+      product_manager: '产品经理',
+      hr: 'HR',
+      business_manager: '商务经理'
+    };
+
+    const statusFlow = {
+      pending: ['survey_sent', 'rejected', 'withdrawn'],
+      survey_sent: ['survey_done', 'rejected', 'withdrawn'],
+      survey_done: ['invited', 'rejected', 'withdrawn'],
+      invited: ['exam_sent', 'rejected', 'withdrawn'],
+      exam_sent: ['exam_done', 'rejected', 'withdrawn'],
+      exam_done: ['offered', 'rejected', 'withdrawn'],
+      offered: [],
+      rejected: [],
+      withdrawn: []
+    };
+
+    const statusActions = {
+      survey_sent: '发送问卷',
+      survey_done: '提交问卷',
+      invited: '发送邀请',
+      exam_sent: '发送考核',
+      exam_done: '完成考核',
+      offered: '发送Offer',
+      rejected: '拒绝'
+    };
+
+    // ============ Dashboard ============
+    function renderDashboard() {
+      const total = store.candidates.length;
+      const pending = store.candidates.filter(c => c.status === 'pending').length;
+      const inProgress = store.candidates.filter(c => !['pending', 'offered', 'rejected', 'withdrawn'].includes(c.status)).length;
+      const completed = store.candidates.filter(c => ['offered', 'rejected', 'withdrawn'].includes(c.status)).length;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-pending').textContent = pending;
+      document.getElementById('stat-in-progress').textContent = inProgress;
+      document.getElementById('stat-completed').textContent = completed;
+
+      const activitiesHtml = store.activities
+        .sort((a, b) => new Date(b.time) - new Date(a.time))
+        .slice(0, 5)
+        .map(a => `
+          <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+            <div style="font-size: 14px;">${a.content}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">${formatTime(a.time)}</div>
+          </div>
+        `).join('');
+
+      document.getElementById('recent-activities').innerHTML = activitiesHtml || '<p style="color: #6b7280;">暂无动态</p>';
+    }
+
+    // ============ Candidates ============
+    function renderCandidates(filter = 'all') {
+      let candidates = store.candidates;
+      if (filter !== 'all') {
+        candidates = candidates.filter(c => c.status === filter);
+      }
+
+      const html = candidates.map(c => `
+        <tr>
+          <td><strong>${c.name}</strong></td>
+          <td>${c.email}</td>
+          <td>${jobLabels[c.job] || c.job}</td>
+          <td><span class="status status-${c.status}">${statusLabels[c.status]}</span></td>
+          <td>${formatTime(c.created_at)}</td>
+          <td>
+            <button class="btn btn-sm btn-secondary" onclick="viewCandidate('${c.id}')">查看</button>
+            ${statusFlow[c.status]?.length > 0 ? `<button class="btn btn-sm btn-primary" onclick="showStatusModal('${c.id}')">流转</button>` : ''}
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('candidates-table').innerHTML = html || '<tr><td colspan="6" style="text-align: center; color: #6b7280;">暂无候选人</td></tr>';
+    }
+
+    function filterCandidates(value) {
+      renderCandidates(value);
+    }
+
+    // ============ Assessments ============
+    let currentAssessmentType = 'questionnaire';
+
+    function switchAssessmentTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentAssessmentType = tab.dataset.type;
+      renderAssessments();
+    }
+
+    function renderAssessments() {
+      const assessments = store.assessments.filter(a => a.type === currentAssessmentType);
+      
+      const html = assessments.map(a => `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">${a.title}</div>
+            <div>
+              <button class="btn btn-sm btn-secondary" onclick="viewAssessment('${a.id}')">查看</button>
+              <button class="btn btn-sm btn-primary" onclick="assignAssessment('${a.id}')">分配给候选人</button>
+            </div>
+          </div>
+          <div style="color: #6b7280; font-size: 14px;">
+            ${a.questions.length} 个问题
+            ${a.time_limit ? ` · 限时 ${a.time_limit} 分钟` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('assessments-list').innerHTML = html || '<p style="color: #6b7280; text-align: center; padding: 40px;">暂无评估</p>';
+    }
+
+    // ============ Workflow ============
+    function renderWorkflow() {
+      const select = document.querySelector('#page-workflow select');
+      select.innerHTML = '<option value="">选择候选人</option>' +
+        store.candidates.map(c => `<option value="${c.id}">${c.name} - ${jobLabels[c.job]}</option>`).join('');
+      
+      document.getElementById('workflow-timeline').innerHTML = '<p style="color: #6b7280; text-align: center; padding: 40px;">请先选择候选人</p>';
+      document.getElementById('workflow-actions-card').style.display = 'none';
+    }
+
+    function selectCandidateForWorkflow(candidateId) {
+      if (!candidateId) {
+        document.getElementById('workflow-timeline').innerHTML = '<p style="color: #6b7280; text-align: center; padding: 40px;">请先选择候选人</p>';
+        document.getElementById('workflow-actions-card').style.display = 'none';
+        return;
+      }
+
+      const candidate = store.candidates.find(c => c.id === candidateId);
+      if (!candidate) return;
+
+      // Build timeline
+      const allStatuses = ['pending', 'survey_sent', 'survey_done', 'invited', 'exam_sent', 'exam_done', 'offered'];
+      const currentIndex = allStatuses.indexOf(candidate.status);
+      const isRejected = candidate.status === 'rejected';
+      const isWithdrawn = candidate.status === 'withdrawn';
+
+      let timelineHtml = '<div class="timeline">';
+      allStatuses.forEach((status, index) => {
+        let dotClass = '';
+        if (isRejected || isWithdrawn) {
+          dotClass = index <= currentIndex ? 'completed' : '';
+        } else {
+          if (index < currentIndex) dotClass = 'completed';
+          else if (index === currentIndex) dotClass = 'current';
+        }
+
+        timelineHtml += `
+          <div class="timeline-item">
+            <div class="timeline-dot ${dotClass}"></div>
+            <div class="timeline-content">
+              <div style="font-weight: 500;">${statusLabels[status]}</div>
+              ${index === currentIndex && (isRejected || isWithdrawn) ? `<div style="color: #ef4444; font-size: 12px; margin-top: 4px;">已${isRejected ? '拒绝' : '退出'}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      if (isRejected || isWithdrawn) {
+        timelineHtml += `
+          <div class="timeline-item">
+            <div class="timeline-dot current"></div>
+            <div class="timeline-content">
+              <div style="font-weight: 500; color: ${isRejected ? '#ef4444' : '#6b7280'};">${statusLabels[candidate.status]}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      timelineHtml += '</div>';
+      document.getElementById('workflow-timeline').innerHTML = timelineHtml;
+
+      // Show actions
+      const actions = statusFlow[candidate.status] || [];
+      if (actions.length > 0) {
+        document.getElementById('workflow-actions-card').style.display = 'block';
+        document.getElementById('workflow-actions').innerHTML = actions.map(action => `
+          <button class="btn btn-primary" style="margin-right: 10px;" onclick="executeWorkflowAction('${candidateId}', '${action}')">
+            ${statusActions[action]}
+          </button>
+        `).join('');
+      } else {
+        document.getElementById('workflow-actions-card').style.display = 'none';
+      }
+    }
+
+    function executeWorkflowAction(candidateId, newStatus) {
+      const candidate = store.candidates.find(c => c.id === candidateId);
+      if (!candidate) return;
+
+      const oldStatus = candidate.status;
+      candidate.status = newStatus;
+
+      // Add activity
+      store.activities.push({
+        id: 'act' + Date.now(),
+        type: 'status_change',
+        content: `${candidate.name} 状态从 ${statusLabels[oldStatus]} 变为 ${statusLabels[newStatus]}`,
+        time: new Date().toISOString()
+      });
+
+      // Add notification
+      store.notifications.push({
+        id: 'n' + Date.now(),
+        type: 'workflow',
+        title: `状态变更: ${candidate.name}`,
+        content: `${candidate.name} 的状态已更新为 ${statusLabels[newStatus]}`,
+        read: false,
+        created_at: new Date().toISOString()
+      });
+
+      saveData();
+      showNotification(`已将 ${candidate.name} 的状态更新为 ${statusLabels[newStatus]}`);
+      selectCandidateForWorkflow(candidateId);
+      renderDashboard();
+    }
+
+    // ============ Notifications ============
+    function renderNotifications() {
+      const html = store.notifications
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .map(n => `
+          <div style="padding: 15px; border-bottom: 1px solid #e5e7eb; ${n.read ? 'opacity: 0.6;' : ''}">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 500;">${n.title}</div>
+              <div style="font-size: 12px; color: #6b7280;">${formatTime(n.created_at)}</div>
+            </div>
+            <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">${n.content}</div>
+            ${!n.read ? `<button class="btn btn-sm btn-secondary" style="margin-top: 8px;" onclick="markNotificationRead('${n.id}')">标记已读</button>` : ''}
+          </div>
+        `).join('');
+
+      document.getElementById('notifications-list').innerHTML = html || '<p style="color: #6b7280; text-align: center; padding: 40px;">暂无通知</p>';
+    }
+
+    function markNotificationRead(id) {
+      const notification = store.notifications.find(n => n.id === id);
+      if (notification) {
+        notification.read = true;
+        saveData();
+        renderNotifications();
+      }
+    }
+
+    function markAllNotificationsRead() {
+      store.notifications.forEach(n => n.read = true);
+      saveData();
+      renderNotifications();
+      showNotification('已全部标记为已读');
+    }
+
+    // ============ Modals ============
+    function showAddCandidateModal() {
+      document.getElementById('modal-add-candidate').classList.add('active');
+    }
+
+    function showStatusModal(candidateId) {
+      const candidate = store.candidates.find(c => c.id === candidateId);
+      if (!candidate) return;
+
+      const actions = statusFlow[candidate.status] || [];
+      if (actions.length === 0) return;
+
+      const html = `
+        <div style="margin-bottom: 20px;">
+          <p><strong>${candidate.name}</strong> 当前状态: <span class="status status-${candidate.status}">${statusLabels[candidate.status]}</span></p>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label class="form-label">选择新状态</label>
+          <select class="form-select" id="new-status-select">
+            ${actions.map(a => `<option value="${a}">${statusActions[a]} (${statusLabels[a]})</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注（可选）</label>
+          <textarea class="form-textarea" id="status-note" placeholder="填写状态变更原因..."></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-secondary" onclick="closeModal('modal-assessment')">取消</button>
+          <button class="btn btn-primary" onclick="confirmStatusChange('${candidateId}')">确认</button>
+        </div>
+      `;
+
+      document.getElementById('assessment-modal-title').textContent = '状态流转';
+      document.getElementById('assessment-modal-content').innerHTML = html;
+      document.getElementById('modal-assessment').classList.add('active');
+    }
+
+    function confirmStatusChange(candidateId) {
+      const newStatus = document.getElementById('new-status-select').value;
+      executeWorkflowAction(candidateId, newStatus);
+      closeModal('modal-assessment');
+      renderCandidates();
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // ============ Add Candidate ============
+    function addCandidate(event) {
+      event.preventDefault();
+      
+      const candidate = {
+        id: 'c' + Date.now(),
+        name: document.getElementById('candidate-name').value,
+        email: document.getElementById('candidate-email').value,
+        job: document.getElementById('candidate-job').value,
+        source: document.getElementById('candidate-source').value || '未知',
+        status: 'pending',
+        created_at: new Date().toISOString()
+      };
+
+      store.candidates.push(candidate);
+      
+      store.activities.push({
+        id: 'act' + Date.now(),
+        type: 'candidate_added',
+        content: `${candidate.name} 投递了 ${jobLabels[candidate.job]} 岗位`,
+        time: new Date().toISOString()
+      });
+
+      store.notifications.push({
+        id: 'n' + Date.now(),
+        type: 'new_candidate',
+        title: '新候选人投递',
+        content: `${candidate.name} 投递了 ${jobLabels[candidate.job]} 岗位`,
+        read: false,
+        created_at: new Date().toISOString()
+      });
+
+      saveData();
+      closeModal('modal-add-candidate');
+      showNotification(`已添加候选人 ${candidate.name}`);
+      
+      // Reset form
+      document.getElementById('candidate-name').value = '';
+      document.getElementById('candidate-email').value = '';
+      document.getElementById('candidate-source').value = '';
+      
+      renderCandidates();
+      renderDashboard();
+    }
+
+    // ============ View Candidate ============
+    function viewCandidate(candidateId) {
+      const candidate = store.candidates.find(c => c.id === candidateId);
+      if (!candidate) return;
+
+      const candidateAnswers = store.answers.filter(a => a.candidate_id === candidateId);
+
+      const html = `
+        <div style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 10px;">${candidate.name}</h3>
+          <p>邮箱: ${candidate.email}</p>
+          <p>岗位: ${jobLabels[candidate.job]}</p>
+          <p>来源: ${candidate.source}</p>
+          <p>状态: <span class="status status-${candidate.status}">${statusLabels[candidate.status]}</span></p>
+          <p>投递时间: ${formatTime(candidate.created_at)}</p>
+        </div>
+        ${candidateAnswers.length > 0 ? `
+          <div>
+            <h4 style="margin-bottom: 10px;">评估记录</h4>
+            ${candidateAnswers.map(a => {
+              const assessment = store.assessments.find(as => as.id === a.assessment_id);
+              return `
+                <div style="background: #f9fafb; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                  <div style="font-weight: 500;">${assessment?.title || '未知评估'}</div>
+                  <div style="font-size: 12px; color: #6b7280;">提交时间: ${formatTime(a.submitted_at)}</div>
+                  <div style="margin-top: 8px;">
+                    ${a.answers.map(ans => `
+                      <div style="margin-bottom: 8px;">
+                        <div style="font-size: 14px; color: #374151;">${ans.question_label}</div>
+                        <div style="color: #6b7280;">${Array.isArray(ans.value) ? ans.value.join(', ') : (typeof ans.value === 'object' ? JSON.stringify(ans.value) : ans.value)}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : '<p style="color: #6b7280;">暂无评估记录</p>'}
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button class="btn btn-secondary" onclick="closeModal('modal-assessment')">关闭</button>
+        </div>
+      `;
+
+      document.getElementById('assessment-modal-title').textContent = '候选人详情';
+      document.getElementById('assessment-modal-content').innerHTML = html;
+      document.getElementById('modal-assessment').classList.add('active');
+    }
+
+    // ============ View Assessment ============
+    function viewAssessment(assessmentId) {
+      const assessment = store.assessments.find(a => a.id === assessmentId);
+      if (!assessment) return;
+
+      const html = `
+        <div style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 10px;">${assessment.title}</h3>
+          <p style="color: #6b7280;">类型: ${assessment.type === 'questionnaire' ? '问卷' : assessment.type === 'exam' ? '考核' : '面试'}</p>
+          ${assessment.time_limit ? `<p style="color: #6b7280;">限时: ${assessment.time_limit} 分钟</p>` : ''}
+        </div>
+        <div>
+          <h4 style="margin-bottom: 10px;">问题列表</h4>
+          ${assessment.questions.map((q, i) => `
+            <div class="question">
+              <div class="question-header">
+                <div class="question-label">${i + 1}. ${q.label}</div>
+                <span class="question-type">${q.type}</span>
+              </div>
+              ${q.options ? `
+                <div class="question-options">
+                  ${q.options.map(opt => `
+                    <div class="option">
+                      <input type="${q.type === 'multi_select' ? 'checkbox' : 'radio'}" disabled>
+                      <span>${opt.label}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button class="btn btn-secondary" onclick="closeModal('modal-assessment')">关闭</button>
+        </div>
+      `;
+
+      document.getElementById('assessment-modal-title').textContent = '评估详情';
+      document.getElementById('assessment-modal-content').innerHTML = html;
+      document.getElementById('modal-assessment').classList.add('active');
+    }
+
+    // ============ Assign Assessment ============
+    function assignAssessment(assessmentId) {
+      const assessment = store.assessments.find(a => a.id === assessmentId);
+      if (!assessment) return;
+
+      const candidates = store.candidates.filter(c => c.status !== 'rejected' && c.status !== 'withdrawn');
+
+      const html = `
+        <div style="margin-bottom: 20px;">
+          <p>将 <strong>${assessment.title}</strong> 分配给候选人</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">选择候选人</label>
+          <select class="form-select" id="assign-candidate-select">
+            <option value="">请选择</option>
+            ${candidates.map(c => `<option value="${c.id}">${c.name} - ${jobLabels[c.job]}</option>`).join('')}
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-secondary" onclick="closeModal('modal-assessment')">取消</button>
+          <button class="btn btn-primary" onclick="confirmAssignAssessment('${assessmentId}')">确认分配</button>
+        </div>
+      `;
+
+      document.getElementById('assessment-modal-title').textContent = '分配评估';
+      document.getElementById('assessment-modal-content').innerHTML = html;
+      document.getElementById('modal-assessment').classList.add('active');
+    }
+
+    function confirmAssignAssessment(assessmentId) {
+      const candidateId = document.getElementById('assign-candidate-select').value;
+      if (!candidateId) {
+        showNotification('请选择候选人', true);
+        return;
+      }
+
+      const candidate = store.candidates.find(c => c.id === candidateId);
+      const assessment = store.assessments.find(a => a.id === assessmentId);
+
+      // Show take assessment modal
+      showTakeAssessment(assessmentId, candidateId);
+      closeModal('modal-assessment');
+    }
+
+    // ============ Take Assessment ============
+    function showTakeAssessment(assessmentId, candidateId) {
+      const assessment = store.assessments.find(a => a.id === assessmentId);
+      const candidate = store.candidates.find(c => c.id === candidateId);
+      if (!assessment || !candidate) return;
+
+      let html = `
+        <div style="margin-bottom: 20px;">
+          <p>候选人: <strong>${candidate.name}</strong></p>
+          <p>评估: <strong>${assessment.title}</strong></p>
+        </div>
+        <form onsubmit="submitAssessment(event, '${assessmentId}', '${candidateId}')">
+      `;
+
+      assessment.questions.forEach((q, i) => {
+        html += `<div class="form-group">`;
+        html += `<label class="form-label">${i + 1}. ${q.label} ${q.required ? '<span style="color: #ef4444;">*</span>' : ''}</label>`;
+        
+        switch(q.type) {
+          case 'text':
+            html += `<textarea class="form-textarea" name="${q.id}" ${q.required ? 'required' : ''}></textarea>`;
+            break;
+          case 'select':
+            html += `<select class="form-select" name="${q.id}" ${q.required ? 'required' : ''}>
+              <option value="">请选择</option>
+              ${q.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('')}
+            </select>`;
+            break;
+          case 'multi_select':
+            html += q.options.map(opt => `
+              <div class="option">
+                <input type="checkbox" name="${q.id}" value="${opt.value}" id="${q.id}_${opt.value}">
+                <label for="${q.id}_${opt.value}">${opt.label}</label>
+              </div>
+            `).join('');
+            break;
+          case 'code':
+            html += `<textarea class="form-textarea" name="${q.id}" ${q.required ? 'required' : ''} placeholder="请输入代码..." style="font-family: monospace; min-height: 120px;"></textarea>`;
+            break;
+          case 'scale':
+            const config = q.scale_config || { min: 1, max: 5 };
+            html += `<div style="display: flex; gap: 10px; align-items: center;">
+              <span>${config.min}</span>
+              <input type="range" name="${q.id}" min="${config.min}" max="${config.max}" value="${Math.floor((config.min + config.max) / 2)}" style="flex: 1;">
+              <span>${config.max}</span>
+              <span id="${q.id}_value" style="min-width: 30px; text-align: center;">${Math.floor((config.min + config.max) / 2)}</span>
+            </div>`;
+            break;
+        }
+        
+        html += `</div>`;
+      });
+
+      html += `
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-take-assessment')">取消</button>
+          <button type="submit" class="btn btn-primary">提交评估</button>
+        </div>
+        </form>
+      `;
+
+      document.getElementById('take-assessment-title').textContent = '填写评估';
+      document.getElementById('take-assessment-content').innerHTML = html;
+      document.getElementById('modal-take-assessment').classList.add('active');
+
+      // Add range value display
+      assessment.questions.filter(q => q.type === 'scale').forEach(q => {
+        const input = document.querySelector(`input[name="${q.id}"]`);
+        const display = document.getElementById(`${q.id}_value`);
+        if (input && display) {
+          input.addEventListener('input', () => display.textContent = input.value);
+        }
+      });
+    }
+
+    function submitAssessment(event, assessmentId, candidateId) {
+      event.preventDefault();
+      
+      const assessment = store.assessments.find(a => a.id === assessmentId);
+      if (!assessment) return;
+
+      const answers = [];
+      assessment.questions.forEach(q => {
+        let value;
+        if (q.type === 'multi_select') {
+          const checked = document.querySelectorAll(`input[name="${q.id}"]:checked`);
+          value = Array.from(checked).map(c => c.value);
+        } else if (q.type === 'scale') {
+          value = parseInt(document.querySelector(`input[name="${q.id}"]`).value);
+        } else {
+          const input = document.querySelector(`[name="${q.id}"]`);
+          value = input ? input.value : '';
+        }
+        
+        answers.push({
+          question_id: q.id,
+          question_label: q.label,
+          value: value
+        });
+      });
+
+      const answerRecord = {
+        id: 'ans' + Date.now(),
+        assessment_id: assessmentId,
+        assessment_type: assessment.type,
+        candidate_id: candidateId,
+        submitted_at: new Date().toISOString(),
+        answers: answers
+      };
+
+      store.answers.push(answerRecord);
+
+      // Update candidate status based on assessment type
+      const candidate = store.candidates.find(c => c.id === candidateId);
+      if (candidate) {
+        if (assessment.type === 'questionnaire' && candidate.status === 'survey_sent') {
+          candidate.status = 'survey_done';
+        } else if (assessment.type === 'exam' && candidate.status === 'exam_sent') {
+          candidate.status = 'exam_done';
+        }
+      }
+
+      // Add activity
+      store.activities.push({
+        id: 'act' + Date.now(),
+        type: 'assessment_submitted',
+        content: `${candidate?.name || '候选人'} 提交了 ${assessment.title}`,
+        time: new Date().toISOString()
+      });
+
+      store.notifications.push({
+        id: 'n' + Date.now(),
+        type: 'assessment',
+        title: `评估提交: ${candidate?.name || '候选人'}`,
+        content: `${candidate?.name || '候选人'} 提交了 ${assessment.title}`,
+        read: false,
+        created_at: new Date().toISOString()
+      });
+
+      saveData();
+      closeModal('modal-take-assessment');
+      showNotification('评估已提交');
+      renderCandidates();
+      renderDashboard();
+    }
+
+    // ============ Create Assessment ============
+    function showCreateAssessmentModal() {
+      const html = `
+        <div class="form-group">
+          <label class="form-label">评估类型</label>
+          <select class="form-select" id="new-assessment-type">
+            <option value="questionnaire">问卷</option>
+            <option value="exam">考核</option>
+            <option value="interview">面试</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">评估标题</label>
+          <input type="text" class="form-input" id="new-assessment-title" placeholder="如：量潮科技准入问卷">
+        </div>
+        <div class="form-group">
+          <label class="form-label">限时（分钟，可选）</label>
+          <input type="number" class="form-input" id="new-assessment-time" placeholder="留空表示不限时">
+        </div>
+        <div class="form-group">
+          <label class="form-label">问题列表</label>
+          <div id="new-assessment-questions"></div>
+          <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 10px;" onclick="addNewQuestion()">+ 添加问题</button>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button class="btn btn-secondary" onclick="closeModal('modal-assessment')">取消</button>
+          <button class="btn btn-primary" onclick="createAssessment()">创建</button>
+        </div>
+      `;
+
+      document.getElementById('assessment-modal-title').textContent = '创建评估';
+      document.getElementById('assessment-modal-content').innerHTML = html;
+      document.getElementById('modal-assessment').classList.add('active');
+      
+      // Reset questions
+      document.getElementById('new-assessment-questions').innerHTML = '';
+      addNewQuestion();
+    }
+
+    let newQuestionCount = 0;
+
+    function addNewQuestion() {
+      newQuestionCount++;
+      const container = document.getElementById('new-assessment-questions');
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.id = `new-question-${newQuestionCount}`;
+      div.innerHTML = `
+        <div class="question-header">
+          <span>问题 ${newQuestionCount}</span>
+          <button type="button" class="btn btn-sm btn-danger" onclick="removeNewQuestion(${newQuestionCount})">删除</button>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" placeholder="问题内容" data-field="label">
+        </div>
+        <div class="form-group">
+          <select class="form-select" data-field="type" onchange="updateQuestionType(${newQuestionCount})">
+            <option value="text">文本</option>
+            <option value="select">单选</option>
+            <option value="multi_select">多选</option>
+            <option value="scale">量表</option>
+          </select>
+        </div>
+        <div id="new-question-${newQuestionCount}-options" class="hidden">
+          <textarea class="form-textarea" placeholder="每行一个选项" data-field="options" rows="3"></textarea>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function removeNewQuestion(index) {
+      const el = document.getElementById(`new-question-${index}`);
+      if (el) el.remove();
+    }
+
+    function updateQuestionType(index) {
+      const type = document.querySelector(`#new-question-${index} select[data-field="type"]`).value;
+      const optionsDiv = document.getElementById(`new-question-${index}-options`);
+      if (type === 'select' || type === 'multi_select') {
+        optionsDiv.classList.remove('hidden');
+      } else {
+        optionsDiv.classList.add('hidden');
+      }
+    }
+
+    function createAssessment() {
+      const type = document.getElementById('new-assessment-type').value;
+      const title = document.getElementById('new-assessment-title').value;
+      const timeLimit = document.getElementById('new-assessment-time').value;
+
+      if (!title) {
+        showNotification('请填写评估标题', true);
+        return;
+      }
+
+      const questions = [];
+      const questionElements = document.querySelectorAll('#new-assessment-questions .question');
+      questionElements.forEach((el, index) => {
+        const label = el.querySelector('[data-field="label"]').value;
+        const qType = el.querySelector('[data-field="type"]').value;
+        
+        if (!label) return;
+
+        const question = {
+          id: 'q' + Date.now() + index,
+          type: qType,
+          category: 'custom',
+          order: index + 1,
+          required: true,
+          label: label
+        };
+
+        if (qType === 'select' || qType === 'multi_select') {
+          const optionsText = el.querySelector('[data-field="options"]').value;
+          question.options = optionsText.split('\n').filter(o => o.trim()).map(o => ({
+            value: o.trim().toLowerCase().replace(/\s+/g, '_'),
+            label: o.trim()
+          }));
+        }
+
+        if (qType === 'scale') {
+          question.scale_config = { min: 1, max: 5 };
+        }
+
+        questions.push(question);
+      });
+
+      if (questions.length === 0) {
+        showNotification('请至少添加一个问题', true);
+        return;
+      }
+
+      const assessment = {
+        id: 'a' + Date.now(),
+        type: type,
+        title: title,
+        time_limit: timeLimit ? parseInt(timeLimit) : null,
+        questions: questions
+      };
+
+      store.assessments.push(assessment);
+      saveData();
+      closeModal('modal-assessment');
+      showNotification('评估已创建');
+      renderAssessments();
+    }
+
+    // ============ Helpers ============
+    function formatTime(isoString) {
+      const date = new Date(isoString);
+      const now = new Date();
+      const diff = now - date;
+      
+      if (diff < 60000) return '刚刚';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)} 分钟前`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)} 小时前`;
+      if (diff < 604800000) return `${Math.floor(diff / 86400000)} 天前`;
+      
+      return date.toLocaleDateString('zh-CN');
+    }
+
+    function showNotification(message, isError = false) {
+      const el = document.getElementById('notification');
+      el.textContent = message;
+      el.className = `notification ${isError ? 'error' : ''} show`;
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // ============ Initialize ============
+    loadData();
+    showPage('dashboard');
+  </script>
+</body>
+</html>

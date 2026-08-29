@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>量潮科技 - 候选人门户</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; }
+    
+    /* Header */
+    .header { background: #1a1a2e; color: #fff; padding: 16px 0; }
+    .header-inner { max-width: 960px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 20px; font-weight: 600; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    
+    /* Main */
+    .main { max-width: 960px; margin: 0 auto; padding: 24px 20px; }
+    
+    /* Welcome */
+    .welcome { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; border-radius: 12px; padding: 32px; margin-bottom: 24px; }
+    .welcome h1 { font-size: 24px; margin-bottom: 8px; }
+    .welcome p { opacity: 0.9; }
+    
+    /* Status Card */
+    .status-card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .status-title { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 500; }
+    .status-badge.pending { background: #fef3c7; color: #92400e; }
+    .status-badge.survey_sent { background: #dbeafe; color: #1e40af; }
+    .status-badge.survey_done { background: #d1fae5; color: #065f46; }
+    .status-badge.invited { background: #e0e7ff; color: #3730a3; }
+    .status-badge.exam_sent { background: #fce7f3; color: #9d174d; }
+    .status-badge.exam_done { background: #d1fae5; color: #065f46; }
+    .status-badge.offered { background: #bbf7d0; color: #166534; }
+    .status-badge.rejected { background: #fee2e2; color: #991b1b; }
+    
+    /* Progress Steps */
+    .progress { display: flex; justify-content: space-between; margin-bottom: 24px; position: relative; }
+    .progress::before { content: ''; position: absolute; top: 20px; left: 40px; right: 40px; height: 2px; background: #e5e7eb; }
+    .progress-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+    .step-circle { width: 40px; height: 40px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #6b7280; margin-bottom: 8px; }
+    .step-circle.completed { background: #10b981; color: #fff; }
+    .step-circle.current { background: #4f46e5; color: #fff; box-shadow: 0 0 0 4px rgba(79,70,229,0.2); }
+    .step-label { font-size: 12px; color: #6b7280; text-align: center; }
+    .step-label.active { color: #4f46e5; font-weight: 600; }
+    
+    /* Sections */
+    .section { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .section-title { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    
+    /* Buttons */
+    .btn { display: inline-block; padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-success:hover { background: #059669; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-block { display: block; width: 100%; text-align: center; }
+    
+    /* Notification Item */
+    .notification-item { padding: 16px; border-bottom: 1px solid #e5e7eb; display: flex; gap: 12px; }
+    .notification-item:last-child { border-bottom: none; }
+    .notification-item.unread { background: #f9fafb; }
+    .notification-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .notification-icon.survey { background: #dbeafe; }
+    .notification-icon.invite { background: #e0e7ff; }
+    .notification-icon.exam { background: #fce7f3; }
+    .notification-icon.offer { background: #bbf7d0; }
+    .notification-icon.system { background: #e5e7eb; }
+    .notification-content { flex: 1; }
+    .notification-title { font-weight: 500; margin-bottom: 4px; }
+    .notification-text { font-size: 14px; color: #6b7280; }
+    .notification-time { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+    
+    /* Assessment Card */
+    .assessment-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .assessment-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .assessment-card-title { font-weight: 500; }
+    .assessment-card-meta { font-size: 14px; color: #6b7280; }
+    .assessment-card-status { font-size: 12px; padding: 4px 8px; border-radius: 12px; }
+    .assessment-card-status.pending { background: #fef3c7; color: #92400e; }
+    .assessment-card-status.completed { background: #d1fae5; color: #065f46; }
+    
+    /* Form */
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px; }
+    .form-label .required { color: #ef4444; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+    .form-textarea { min-height: 100px; resize: vertical; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    
+    /* Radio / Checkbox */
+    .option-group { display: flex; flex-direction: column; gap: 10px; }
+    .option-item { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .option-item:hover { border-color: #4f46e5; background: #f9fafb; }
+    .option-item.selected { border-color: #4f46e5; background: #eef2ff; }
+    .option-item input { width: 18px; height: 18px; }
+    .option-item label { cursor: pointer; flex: 1; }
+    
+    /* Scale */
+    .scale-group { display: flex; align-items: center; gap: 16px; }
+    .scale-labels { display: flex; justify-content: space-between; width: 100%; }
+    .scale-label { font-size: 12px; color: #6b7280; }
+    .scale-value { font-size: 24px; font-weight: 600; color: #4f46e5; min-width: 40px; text-align: center; }
+    input[type="range"] { flex: 1; height: 8px; -webkit-appearance: none; background: #e5e7eb; border-radius: 4px; outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #4f46e5; border-radius: 50%; cursor: pointer; }
+    
+    /* Timeline */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #e5e7eb; }
+    .timeline-item { position: relative; padding-bottom: 24px; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot { position: absolute; left: -20px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #e5e7eb; border: 3px solid #fff; box-shadow: 0 0 0 2px #e5e7eb; }
+    .timeline-dot.completed { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
+    .timeline-dot.current { background: #4f46e5; box-shadow: 0 0 0 2px #4f46e5, 0 0 0 6px rgba(79,70,229,0.2); }
+    .timeline-content { background: #f9fafb; border-radius: 8px; padding: 12px; }
+    .timeline-title { font-weight: 500; margin-bottom: 4px; }
+    .timeline-time { font-size: 12px; color: #6b7280; }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
+    .tab { padding: 12px 20px; cursor: pointer; font-size: 14px; color: #6b7280; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .tab:hover { color: #4f46e5; }
+    .tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 500; }
+    
+    /* Empty State */
+    .empty-state { text-align: center; padding: 40px; color: #6b7280; }
+    .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state-text { font-size: 16px; }
+    
+    /* Alert */
+    .alert { padding: 16px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 12px; }
+    .alert-info { background: #dbeafe; color: #1e40af; }
+    .alert-success { background: #d1fae5; color: #065f46; }
+    .alert-warning { background: #fef3c7; color: #92400e; }
+    .alert-icon { font-size: 20px; }
+    
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 24px; width: 600px; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 20px; font-weight: 600; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+    
+    /* Notification Toast */
+    .toast { position: fixed; top: 20px; right: 20px; background: #10b981; color: #fff; padding: 14px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s; z-index: 200; }
+    .toast.show { transform: translateX(0); }
+    .toast.error { background: #ef4444; }
+    
+    /* Hidden */
+    .hidden { display: none !important; }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .progress { flex-wrap: wrap; gap: 16px; justify-content: center; }
+      .progress::before { display: none; }
+      .progress-step { flex: 0 0 auto; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">量潮科技</div>
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">张</div>
+        <span id="user-name">张三</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Welcome Section -->
+    <div class="welcome">
+      <h1>你好，<span id="welcome-name">张三</span> 👋</h1>
+      <p>欢迎来到量潮科技候选人门户，在这里你可以查看投递进度、完成评估、接收通知。</p>
+    </div>
+
+    <!-- Status Card -->
+    <div class="status-card">
+      <div class="status-header">
+        <div class="status-title">投递进度</div>
+        <span class="status-badge" id="current-status-badge">待处理</span>
+      </div>
+      
+      <!-- Progress Steps -->
+      <div class="progress">
+        <div class="progress-step">
+          <div class="step-circle" id="step-1">1</div>
+          <div class="step-label">投递</div>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle" id="step-2">2</div>
+          <div class="step-label">问卷</div>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle" id="step-3">3</div>
+          <div class="step-label">入群</div>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle" id="step-4">4</div>
+          <div class="step-label">考核</div>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle" id="step-5">5</div>
+          <div class="step-label">Offer</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="assessments" onclick="switchTab(this)">待办评估</div>
+      <div class="tab" data-tab="notifications" onclick="switchTab(this)">通知消息</div>
+      <div class="tab" data-tab="history" onclick="switchTab(this)">操作记录</div>
+    </div>
+
+    <!-- Assessments Tab -->
+    <div id="tab-assessments" class="tab-content">
+      <div id="assessments-list"></div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div id="tab-notifications" class="tab-content hidden">
+      <div class="section">
+        <div id="notifications-list"></div>
+      </div>
+    </div>
+
+    <!-- History Tab -->
+    <div id="tab-history" class="tab-content hidden">
+      <div class="section">
+        <div class="timeline" id="history-timeline"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assessment Modal -->
+  <div class="modal-overlay" id="modal-assessment">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">填写评估</div>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============ Mock Data ============
+    // In real app, this would come from API
+    const mockData = {
+      candidate: {
+        id: 'c001',
+        name: '张三',
+        email: 'zhangsan@example.com',
+        job: '数据工程师',
+        status: 'survey_sent',
+        created_at: '2024-01-15T10:00:00Z'
+      },
+      
+      assessments: [
+        {
+          id: 'a001',
+          type: 'questionnaire',
+          title: '量潮科技准入问卷',
+          description: '请基于真实想法认真作答，大约需要15-20分钟',
+          status: 'pending',
+          questions: [
+            { id: 'q001', type: 'text', category: 'basic', order: 1, required: true, label: '您的姓名和专业' },
+            { id: 'q002', type: 'select', category: 'basic', order: 2, required: true, label: '请选择您的岗位方向', options: [
+              { value: 'product_manager', label: '产品经理' },
+              { value: 'data_engineer', label: '数据工程师' },
+              { value: 'hr', label: 'HR' },
+              { value: 'business_manager', label: '商务经理' }
+            ]},
+            { id: 'q003', type: 'multi_select', category: 'motivation', order: 3, required: true, label: '驱动你这次看机会的最主要原因是什么？', options: [
+              { value: 'growth_limit', label: '看不到成长' },
+              { value: 'industry_change', label: '想换赛道' },
+              { value: 'attracted_by_brand', label: '被量潮吸引' }
+            ]},
+            { id: 'q004', type: 'text', category: 'values', order: 4, required: true, label: '如果你入职后发现实际工作和预期有出入，你会怎么应对？' }
+          ]
+        },
+        {
+          id: 'a002',
+          type: 'exam',
+          title: '数据工程师笔试',
+          description: '限时60分钟，请在安静环境下完成',
+          status: 'locked',
+          time_limit: 60,
+          questions: [
+            { id: 'q101', type: 'select', category: 'technical', order: 1, required: true, label: '以下哪个是列式数据库？', options: [
+              { value: 'a', label: 'MySQL' },
+              { value: 'b', label: 'PostgreSQL' },
+              { value: 'c', label: 'ClickHouse' },
+              { value: 'd', label: 'MongoDB' }
+            ]},
+            { id: 'q102', type: 'text', category: 'technical', order: 2, required: true, label: '请简述 ETL 和 ELT 的区别' },
+            { id: 'q103', type: 'text', category: 'technical', order: 3, required: true, label: '用 Python 实现列表去重并排序的函数' }
+          ]
+        }
+      ],
+      
+      notifications: [
+        {
+          id: 'n001',
+          type: 'survey',
+          title: '请填写准入问卷',
+          content: '感谢你对量潮科技的关注与投递。请在3个工作日内完成准入问卷。',
+          read: false,
+          created_at: '2024-01-15T10:05:00Z'
+        },
+        {
+          id: 'n002',
+          type: 'system',
+          title: '投递已收到',
+          content: '你的数据工程师岗位投递已收到，我们会尽快处理。',
+          read: true,
+          created_at: '2024-01-15T10:01:00Z'
+        }
+      ],
+      
+      history: [
+        { id: 'h001', action: '投递岗位', detail: '投递了数据工程师岗位', time: '2024-01-15T10:00:00Z' },
+        { id: 'h002', action: '系统通知', detail: '投递已收到确认', time: '2024-01-15T10:01:00Z' },
+        { id: 'h003', action: '发送问卷', detail: '收到准入问卷通知', time: '2024-01-15T10:05:00Z' }
+      ]
+    };
+
+    // Status mapping
+    const statusLabels = {
+      pending: '待处理',
+      survey_sent: '待填问卷',
+      survey_done: '已填问卷',
+      invited: '已邀请',
+      exam_sent: '待考核',
+      exam_done: '已考核',
+      offered: '已发Offer',
+      rejected: '已拒绝'
+    };
+
+    const statusSteps = {
+      pending: 1,
+      survey_sent: 2,
+      survey_done: 2,
+      invited: 3,
+      exam_sent: 4,
+      exam_done: 4,
+      offered: 5
+    };
+
+    // ============ Initialize ============
+    function init() {
+      renderProgress();
+      renderAssessments();
+      renderNotifications();
+      renderHistory();
+    }
+
+    // ============ Progress ============
+    function renderProgress() {
+      const status = mockData.candidate.status;
+      const currentStep = statusSteps[status] || 1;
+      const isRejected = status === 'rejected';
+      
+      // Update badge
+      const badge = document.getElementById('current-status-badge');
+      badge.textContent = isRejected ? '已拒绝' : statusLabels[status];
+      badge.className = `status-badge ${status}`;
+      
+      // Update steps
+      for (let i = 1; i <= 5; i++) {
+        const step = document.getElementById(`step-${i}`);
+        if (isRejected) {
+          step.className = 'step-circle';
+        } else if (i < currentStep) {
+          step.className = 'step-circle completed';
+          step.innerHTML = '✓';
+        } else if (i === currentStep) {
+          step.className = 'step-circle current';
+        } else {
+          step.className = 'step-circle';
+        }
+      }
+    }
+
+    // ============ Assessments ============
+    function renderAssessments() {
+      const container = document.getElementById('assessments-list');
+      
+      if (mockData.assessments.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-text">暂无待办评估</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = mockData.assessments.map(a => `
+        <div class="assessment-card">
+          <div class="assessment-card-header">
+            <div>
+              <div class="assessment-card-title">${a.title}</div>
+              <div class="assessment-card-meta">${a.description || ''}</div>
+            </div>
+            <span class="assessment-card-status ${a.status === 'completed' ? 'completed' : 'pending'}">
+              ${a.status === 'completed' ? '已完成' : a.status === 'locked' ? '待开放' : '待完成'}
+            </span>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 12px;">
+            ${a.status === 'pending' ? `<button class="btn btn-primary" onclick="startAssessment('${a.id}')">开始填写</button>` : ''}
+            ${a.status === 'locked' ? `<button class="btn btn-secondary" disabled>待开放</button>` : ''}
+            ${a.status === 'completed' ? `<button class="btn btn-success" disabled>已完成</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ============ Notifications ============
+    function renderNotifications() {
+      const container = document.getElementById('notifications-list');
+      
+      if (mockData.notifications.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🔔</div>
+            <div class="empty-state-text">暂无通知</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = mockData.notifications.map(n => `
+        <div class="notification-item ${n.read ? '' : 'unread'}">
+          <div class="notification-icon ${n.type}">
+            ${n.type === 'survey' ? '📝' : n.type === 'invite' ? '👋' : n.type === 'exam' ? '📝' : '📢'}
+          </div>
+          <div class="notification-content">
+            <div class="notification-title">${n.title}</div>
+            <div class="notification-text">${n.content}</div>
+            <div class="notification-time">${formatTime(n.created_at)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ============ History ============
+    function renderHistory() {
+      const container = document.getElementById('history-timeline');
+      
+      container.innerHTML = mockData.history.map(h => `
+        <div class="timeline-item">
+          <div class="timeline-dot completed"></div>
+          <div class="timeline-content">
+            <div class="timeline-title">${h.action}</div>
+            <div class="timeline-time">${formatTime(h.time)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ============ Tabs ============
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      
+      tab.classList.add('active');
+      document.getElementById(`tab-${tab.dataset.tab}`).classList.remove('hidden');
+    }
+
+    // ============ Start Assessment ============
+    function startAssessment(assessmentId) {
+      const assessment = mockData.assessments.find(a => a.id === assessmentId);
+      if (!assessment) return;
+
+      let html = `
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>${assessment.description}</div>
+        </div>
+        <form onsubmit="submitAssessment(event, '${assessmentId}')">
+      `;
+
+      assessment.questions.forEach((q, i) => {
+        html += `<div class="form-group">`;
+        html += `<label class="form-label">${i + 1}. ${q.label} ${q.required ? '<span class="required">*</span>' : ''}</label>`;
+        
+        switch(q.type) {
+          case 'text':
+            html += `<textarea class="form-textarea" name="${q.id}" ${q.required ? 'required' : ''} placeholder="请输入..."></textarea>`;
+            break;
+          case 'select':
+            html += `
+              <div class="option-group">
+                ${q.options.map(opt => `
+                  <div class="option-item" onclick="selectOption(this, '${q.id}', '${opt.value}')">
+                    <input type="radio" name="${q.id}" value="${opt.value}" ${q.required ? 'required' : ''}>
+                    <label>${opt.label}</label>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+            break;
+          case 'multi_select':
+            html += `
+              <div class="option-group">
+                ${q.options.map(opt => `
+                  <div class="option-item" onclick="toggleOption(this, '${q.id}', '${opt.value}')">
+                    <input type="checkbox" name="${q.id}" value="${opt.value}">
+                    <label>${opt.label}</label>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+            break;
+          case 'scale':
+            const config = q.scale_config || { min: 1, max: 5 };
+            html += `
+              <div class="scale-group">
+                <span class="scale-label">${config.min}</span>
+                <input type="range" name="${q.id}" min="${config.min}" max="${config.max}" value="${Math.floor((config.min + config.max) / 2)}" oninput="updateScaleValue('${q.id}', this.value)">
+                <span class="scale-label">${config.max}</span>
+                <span class="scale-value" id="scale-${q.id}">${Math.floor((config.min + config.max) / 2)}</span>
+              </div>
+            `;
+            break;
+        }
+        
+        html += `</div>`;
+      });
+
+      html += `
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+          <button type="submit" class="btn btn-primary">提交</button>
+        </div>
+        </form>
+      `;
+
+      document.getElementById('modal-title').textContent = assessment.title;
+      document.getElementById('modal-content').innerHTML = html;
+      document.getElementById('modal-assessment').classList.add('active');
+    }
+
+    function selectOption(item, questionId, value) {
+      const group = item.parentElement;
+      group.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
+      item.classList.add('selected');
+      item.querySelector('input').checked = true;
+    }
+
+    function toggleOption(item, questionId, value) {
+      item.classList.toggle('selected');
+      const checkbox = item.querySelector('input');
+      checkbox.checked = !checkbox.checked;
+    }
+
+    function updateScaleValue(questionId, value) {
+      document.getElementById(`scale-${questionId}`).textContent = value;
+    }
+
+    function submitAssessment(event, assessmentId) {
+      event.preventDefault();
+      
+      const assessment = mockData.assessments.find(a => a.id === assessmentId);
+      if (!assessment) return;
+
+      // Collect answers
+      const answers = [];
+      assessment.questions.forEach(q => {
+        let value;
+        if (q.type === 'multi_select') {
+          const checked = document.querySelectorAll(`input[name="${q.id}"]:checked`);
+          value = Array.from(checked).map(c => c.value);
+        } else if (q.type === 'scale') {
+          value = parseInt(document.querySelector(`input[name="${q.id}"]`).value);
+        } else {
+          const input = document.querySelector(`[name="${q.id}"]`);
+          value = input ? input.value : '';
+        }
+        
+        if (q.required && (!value || (Array.isArray(value) && value.length === 0))) {
+          alert(`请完成第${q.order}题: ${q.label}`);
+          throw new Error('Validation failed');
+        }
+        
+        answers.push({
+          question_id: q.id,
+          value: value
+        });
+      });
+
+      // Update assessment status
+      assessment.status = 'completed';
+      
+      // Update candidate status
+      if (assessment.type === 'questionnaire') {
+        mockData.candidate.status = 'survey_done';
+      }
+      
+      // Add to history
+      mockData.history.push({
+        id: 'h' + Date.now(),
+        action: '提交评估',
+        detail: `完成了${assessment.title}`,
+        time: new Date().toISOString()
+      });
+
+      // Add notification
+      mockData.notifications.unshift({
+        id: 'n' + Date.now(),
+        type: 'system',
+        title: '评估已提交',
+        content: `${assessment.title} 已成功提交，请等待审核。`,
+        read: false,
+        created_at: new Date().toISOString()
+      });
+
+      closeModal();
+      showToast('评估已成功提交！');
+      init();
+    }
+
+    // ============ Modal ============
+    function closeModal() {
+      document.getElementById('modal-assessment').classList.remove('active');
+    }
+
+    // ============ Helpers ============
+    function formatTime(isoString) {
+      const date = new Date(isoString);
+      const now = new Date();
+      const diff = now - date;
+      
+      if (diff < 60000) return '刚刚';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)} 分钟前`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)} 小时前`;
+      if (diff < 604800000) return `${Math.floor(diff / 86400000)} 天前`;
+      
+      return date.toLocaleDateString('zh-CN');
+    }
+
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${isError ? 'error' : ''} show`;
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ============ Initialize ============
+    init();
+  </script>
+</body>
+</html>
