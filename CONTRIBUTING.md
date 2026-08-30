@@ -80,7 +80,7 @@ docs/
 │   ├── workflow.md
 │   └── notification.md
 ├── models/               # 数据模型
-│   └── assessment.md
+│   └── index.md
 ├── roadmap/              # 路线图
 │   └── survey.md
 └── *.md                  # 操作指南
